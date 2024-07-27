@@ -19,6 +19,5 @@ const startServer = async () => {
     // Output ngrok url to console
     console.log(`Ingress established at: ${listener.url()}`);
   })();
-  console.log(ENV_DATA.NGROK_API_KEY);
 };
 startServer();

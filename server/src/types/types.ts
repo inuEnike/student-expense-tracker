@@ -10,6 +10,7 @@ export type TUser = {
   coin: number;
   password: string;
   repeatPassword: string;
+  pin: number;
 };
 
 export type TPurchaseProvision = {

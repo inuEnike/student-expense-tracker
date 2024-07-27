@@ -49,10 +49,13 @@ const USERMODEL = new Schema<TUser>(
       type: String,
       default: "",
     },
+    pin: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
-USERMODEL.pre('save', function (next) {
+USERMODEL.pre("save", function (next) {
   if (this.coin) {
     this.coin = Math.round(this.coin);
   }
