@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from "express";
+import cors from "cors";
 import errorhandler from "./middleware/error";
 import auth from "./routes/user.route";
 import purchaseCoin from "./routes/purchaseCoin.route";
@@ -7,6 +8,7 @@ import transaction from "./routes/transaction.route";
 
 const app: Express = express();
 
+app.use(cors());
 app.use(express.json());
 
 let prefix = `/api/v1`;
