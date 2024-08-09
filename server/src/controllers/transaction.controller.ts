@@ -13,6 +13,6 @@ export const send_coin = async (
       .json({ errormessage: "Please the fields are required" });
   }
 
-  const user = ;
+  const user = "";
   console.log(user);
 };
