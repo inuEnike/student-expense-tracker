@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from "express";
+
 import cors from "cors";
 import errorhandler from "./middleware/error";
 import auth from "./routes/user.route";
@@ -10,6 +11,7 @@ const app: Express = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(cors());
 
 let prefix = `/api/v1`;
 
