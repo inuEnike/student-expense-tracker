@@ -9,7 +9,7 @@ import transaction from "./routes/transaction.route";
 
 const app: Express = express();
 
-app.use(cors());
+app.options("*", cors());
 app.use(express.json());
 app.use(cors());
 
