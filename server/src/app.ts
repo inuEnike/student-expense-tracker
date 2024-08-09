@@ -7,11 +7,20 @@ import purchaseCoin from "./routes/purchaseCoin.route";
 import purchaseProvision from "./routes/purchaseprovision.route";
 import transaction from "./routes/transaction.route";
 
+// Define CORS options
+const corsOptions = {
+  origin: "*", // Replace with your client's URL
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  optionsSuccessStatus: 204,
+};
+
 const app: Express = express();
 
-app.options("*", cors());
+// Use CORS with the specified options
+app.use(cors(corsOptions));
+
 app.use(express.json());
-app.use(cors());
 
 let prefix = `/api/v1`;
 
