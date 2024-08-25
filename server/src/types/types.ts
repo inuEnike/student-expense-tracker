@@ -28,3 +28,12 @@ export type TPurchaseCoin = {
   status: string;
   coinValue: number;
 };
+
+export type Ttrans = {
+  from: mongoose.Schema.Types.ObjectId;
+  to: mongoose.Schema.Types.ObjectId;
+  amount: number;
+  description?: string; // optional field
+  createdAt?: Date;
+  updatedAt?: Date;
+};

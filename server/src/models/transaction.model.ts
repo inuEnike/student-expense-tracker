@@ -1,17 +1,20 @@
 import mongoose, { Schema, model } from "mongoose";
+import { Ttrans } from "../types/types";
 
-const transactionSchema = new Schema(
+const transactionSchema = new Schema<Ttrans>(
   {
     from: {
       type: Schema.ObjectId,
       required: true,
+      ref: "USER",
     },
     to: {
       type: Schema.ObjectId,
       required: true,
+      ref: "USER",
     },
     amount: {
-      type: String,
+      type: Number,
       required: true,
     },
     description: {

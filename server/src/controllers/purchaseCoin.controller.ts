@@ -10,13 +10,15 @@ export const buyCoin = async (
   next: NextFunction
 ) => {
   const { userId, amount } = req.body;
+  const session = await mongoose.startSession();
+  session.startTransaction(); // Start transaction session
 
   if (!userId || !amount) {
     return res.status(404).json({ errorMessage: "Fill in the fields" });
   }
 
   try {
-    const user = await USER.findById(userId);
+    const user = await USER.findById(userId).session(session);
     if (!user) {
       return res.status(404).json({ errormessage: "No user found" });
     }
@@ -32,7 +34,7 @@ export const buyCoin = async (
       status: "pending", // set initial status to "pending"
     });
 
-    await purchase.save();
+    await purchase.save({ session });
 
     const response = await Paystack.transaction.initialize({
       email: user.email,
@@ -43,8 +45,11 @@ export const buyCoin = async (
 
     // You can update the purchase status to "initialized" or any other status if you like
     purchase.status = "initialized";
-    await purchase.save();
+    await purchase.save({ session });
 
+    // Commit the transaction if everything is successful
+    await session.commitTransaction();
+    session.endSession();
     return res
       .status(201)
       .json({ message: "Transaction initialized", response });
@@ -53,6 +58,7 @@ export const buyCoin = async (
   }
 };
 
+//Auto verify the transaction with paystack webhook
 export const verifyCoin = async (
   req: Request,
   res: Response,
