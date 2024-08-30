@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getAllTransactions,
+  getUserTransactions,
   send_coin,
 } from "../controllers/transaction.controller";
 import { verifyToken } from "../middleware/auth.middleware";
@@ -9,6 +10,7 @@ const route = express();
 
 route
   .post("/send-coin", verifyToken, send_coin)
-  .get("/transactions", getAllTransactions);
+  .get("/transactions", getAllTransactions)
+  .get("/transaction", getUserTransactions);
 
 export default route;
