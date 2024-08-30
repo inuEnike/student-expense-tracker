@@ -11,6 +11,6 @@ const route = express();
 route
   .post("/send-coin", verifyToken, send_coin)
   .get("/transactions", getAllTransactions)
-  .get("/transaction", getUserTransactions);
+  .get("/transaction", verifyToken, getUserTransactions);
 
 export default route;
