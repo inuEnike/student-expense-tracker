@@ -90,5 +90,5 @@ export const getAllTransactions = async (
     ...purchaseCoinTransaction,
     ...purchaseProvisionTransaction,
   ];
-  return res.status(200).json(getAllData);
+  return res.status(200).json({ data: getAllData });
 };
