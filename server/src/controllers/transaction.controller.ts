@@ -99,29 +99,38 @@ export const getUserTransactions = async (
   next: NextFunction
 ) => {
   const { user } = req.user;
-  // console.log(user);
-  // console.log(req.user);
-  // console.log(req.user.user);
-  // console.log(req.user.matno);
-  // console.log(req.user.user.matno);
 
-  const sendCoinTransactionFrom = await Transaction.find({ from: user?.id });
-  const sendCoinTransactionTo = await Transaction.find({ to: user?.id });
-  const purchaseCoinTransaction = await PurchaseCoin.find({
-    userId: user?.id,
-  });
-  const purchaseProvisionTransaction = await PurchaseProvision.find({
-    userId: user?.id,
-  });
-  console.log("sendCoinTransaction", sendCoinTransactionFrom);
-  console.log("sendCoinTransaction", sendCoinTransactionTo);
-  console.log("purchaseCoinTransaction", purchaseCoinTransaction);
-  console.log("purchaseProvisionTransaction", purchaseProvisionTransaction);
-  const getAllData = [
-    ...sendCoinTransactionTo,
-    ...sendCoinTransactionFrom,
-    ...purchaseCoinTransaction,
-    ...purchaseProvisionTransaction,
-  ];
-  return res.status(200).json({ data: getAllData });
+  try {
+    // Fetching transactions
+    const sendCoinTransactionFrom = await Transaction.find({ from: user?.id });
+    const sendCoinTransactionTo = await Transaction.find({ to: user?.id });
+    const purchaseCoinTransaction = await PurchaseCoin.find({
+      userId: user?.id,
+    });
+    const purchaseProvisionTransaction = await PurchaseProvision.find({
+      userId: user?.id,
+    });
+
+    // Filtering only completed or failed purchaseCoinTransaction
+    const filteredPurchaseCoinTransaction = purchaseCoinTransaction.filter(
+      (transaction) =>
+        transaction.status === "completed" || transaction.status === "failed"
+    );
+
+    // Combining all transactions
+    const getAllData = [
+      ...sendCoinTransactionTo,
+      ...sendCoinTransactionFrom,
+      ...filteredPurchaseCoinTransaction, // Only completed or failed purchase coin transactions
+      ...purchaseProvisionTransaction,
+    ];
+
+    // Returning response
+    return res.status(200).json({ data: getAllData });
+  } catch (error) {
+    console.error("Error fetching user transactions", error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred while fetching transactions." });
+  }
 };
