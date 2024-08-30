@@ -70,7 +70,7 @@ export const signin = async (
     }
 
     // Prepare data for the token
-    const data = { matno: user.matno, email: user.email };
+    const data = { id: user._id, matno: user.matno, email: user.email };
 
     // Generate a token
     const token = handleToken(data);
