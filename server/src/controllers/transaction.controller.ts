@@ -99,24 +99,27 @@ export const getUserTransactions = async (
   next: NextFunction
 ) => {
   const { user } = req.user;
-  console.log(user);
-  console.log(req.user);
-  console.log(req.user.user);
-  console.log(req.user.matno);
-  console.log(req.user.user.matno);
+  // console.log(user);
+  // console.log(req.user);
+  // console.log(req.user.user);
+  // console.log(req.user.matno);
+  // console.log(req.user.user.matno);
 
-  const sendCoinTransaction = await Transaction.find({ matno: user?.matno });
+  const sendCoinTransactionFrom = await Transaction.find({ from: user?.id });
+  const sendCoinTransactionTo = await Transaction.find({ to: user?.id });
   const purchaseCoinTransaction = await PurchaseCoin.find({
     userId: user?.id,
   });
   const purchaseProvisionTransaction = await PurchaseProvision.find({
     userId: user?.id,
   });
-  console.log("sendCoinTransaction", sendCoinTransaction);
+  console.log("sendCoinTransaction", sendCoinTransactionFrom);
+  console.log("sendCoinTransaction", sendCoinTransactionTo);
   console.log("purchaseCoinTransaction", purchaseCoinTransaction);
   console.log("purchaseProvisionTransaction", purchaseProvisionTransaction);
   const getAllData = [
-    ...sendCoinTransaction,
+    ...sendCoinTransactionTo,
+    ...sendCoinTransactionFrom,
     ...purchaseCoinTransaction,
     ...purchaseProvisionTransaction,
   ];
