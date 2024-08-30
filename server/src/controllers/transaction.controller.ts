@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { NextFunction, Request, Response } from "express";
 import { Transaction } from "../models/transaction.model";
 import { USER } from "../models/user.model";
+import { PurchaseCoin } from "../models/purchaseCoin.model";
+import { PurchaseProvision } from "../models/purchaseProvision.model";
 
 export const send_coin = async (
   req: Request,
@@ -73,4 +75,20 @@ export const send_coin = async (
     console.error("Error during transaction:", error);
     return res.status(500).json({ errormessage: "Internal server error" });
   }
+};
+
+export const getAllTransactions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const sendCoinTransaction = await Transaction.find({});
+  const purchaseCoinTransaction = await PurchaseCoin.find({});
+  const purchaseProvisionTransaction = await PurchaseProvision.find({});
+  const getAllData = [
+    ...sendCoinTransaction,
+    ...purchaseCoinTransaction,
+    ...purchaseProvisionTransaction,
+  ];
+  return res.status(200).json(getAllData);
 };

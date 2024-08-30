@@ -1,14 +1,27 @@
+
 import mongoose from "mongoose";
 import { ENV_DATA } from "./envData";
 
-const connect = async () => {
+export const connect = async () => {
   try {
-    await mongoose.connect(ENV_DATA.DB_URI as string);
+    // edit the options to match taste
+    await mongoose.connect(ENV_DATA.DB_URI as string, {
+      connectTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 5000,
+    });
     console.log("DB connected");
   } catch (error) {
     console.error("DB connection error:", error);
-    process.exit(1);
+    throw error;
   }
 };
 
-export default connect;
+export const closeMongo = async () => {
+  try {
+    await mongoose.connection.close();
+    console.log('connection closed successfully');
+  } catch (error) {
+    console.log('error closing database connection');
+    throw error;
+  }
+}
