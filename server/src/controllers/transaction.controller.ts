@@ -107,10 +107,10 @@ export const getUserTransactions = async (
 
   const sendCoinTransaction = await Transaction.find({ matno: user?.matno });
   const purchaseCoinTransaction = await PurchaseCoin.find({
-    userId: user?.matno,
+    userId: user?.id,
   });
   const purchaseProvisionTransaction = await PurchaseProvision.find({
-    userId: user?.matno,
+    userId: user?.id,
   });
   console.log("sendCoinTransaction", sendCoinTransaction);
   console.log("purchaseCoinTransaction", purchaseCoinTransaction);
