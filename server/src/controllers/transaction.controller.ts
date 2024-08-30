@@ -92,3 +92,21 @@ export const getAllTransactions = async (
   ];
   return res.status(200).json({ data: getAllData });
 };
+
+export const getUserTransactions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.log(req.user);
+
+  const sendCoinTransaction = await Transaction.find({});
+  const purchaseCoinTransaction = await PurchaseCoin.find({});
+  const purchaseProvisionTransaction = await PurchaseProvision.find({});
+  const getAllData = [
+    ...sendCoinTransaction,
+    ...purchaseCoinTransaction,
+    ...purchaseProvisionTransaction,
+  ];
+  return res.status(200).json({ data: getAllData });
+};
