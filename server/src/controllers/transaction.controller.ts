@@ -99,7 +99,7 @@ export const getUserTransactions = async (
   next: NextFunction
 ) => {
   const user = req.user;
-  console.log(user.matno);
+  console.log(user.user.matno);
 
   const sendCoinTransaction = await Transaction.find({ matno: user?.matno });
   const purchaseCoinTransaction = await PurchaseCoin.find({
