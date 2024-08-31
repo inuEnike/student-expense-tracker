@@ -6,7 +6,7 @@ const transactionSchema = new Schema<Ttrans>(
     from: {
       type: Schema.ObjectId,
       required: true,
-      ref: "USER",
+      ref: "user",
     },
     to: {
       type: Schema.ObjectId,
