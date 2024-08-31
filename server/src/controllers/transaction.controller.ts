@@ -17,14 +17,14 @@ export const send_coin = async (
     const { from, to, amount, description, pin } = req.body;
 
     // Check if all required fields are present
-    if (!from || !to || !amount) {
+    if (!from || !to || !amount || !pin) {
       return res.status(400).json({ errormessage: "All fields are required" });
     }
 
     // Find the sender and recipient users
     const sender = await USER.findById(from).session(session);
     const recipient = await USER.findById(to).session(session);
-    const senderPin = await USER.findById(pin).session(session);
+    const userWithPin = await USER.findById(from).session(session); // Find user by pin
 
     // Check if both users exist
     if (!sender || !recipient) {
@@ -32,12 +32,13 @@ export const send_coin = async (
         .status(404)
         .json({ errormessage: "Sender or recipient not found" });
     }
-    if (!senderPin) {
-      return res.status(404).json({ errormessage: "Please input your pin" });
+
+    if (!userWithPin || userWithPin.pin !== pin) {
+      return res.status(400).json({ errormessage: "Invalid pin" });
     }
 
     // Check if the sender has sufficient coin
-    if (sender?.coin < amount) {
+    if (sender.coin < amount) {
       return res.status(400).json({ errormessage: "Insufficient coin" });
     }
 
@@ -49,6 +50,9 @@ export const send_coin = async (
     recipient.coin += Number(amount);
     await recipient.save({ session });
 
+    // Determine the type based on the role
+    const transactionType = sender._id.equals(from) ? "Debit" : "Credit";
+
     // Create a transaction record
     const transaction = new Transaction({
       from: sender._id,
@@ -56,6 +60,7 @@ export const send_coin = async (
       amount,
       description,
       date: new Date(),
+      type: transactionType, // Set the type based on the condition
     });
 
     await transaction.save({ session });
@@ -181,10 +186,8 @@ export const getRecentUserTransactions = async (
     return res.status(200).json({ data: recentTransactions });
   } catch (error) {
     console.error("Error fetching recent transactions", error);
-    return res
-      .status(500)
-      .json({
-        message: "An error occurred while fetching recent transactions.",
-      });
+    return res.status(500).json({
+      message: "An error occurred while fetching recent transactions.",
+    });
   }
 };

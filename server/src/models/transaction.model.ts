@@ -20,6 +20,10 @@ const transactionSchema = new Schema<Ttrans>(
     description: {
       type: String,
     },
+    type: {
+      type: String,
+      default: "send", // default type for this model
+    },
   },
   { timestamps: true }
 );

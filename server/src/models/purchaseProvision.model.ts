@@ -29,6 +29,10 @@ const purchaseProvisionSchema = new Schema<TPurchaseProvision>(
       type: Number,
       required: true,
     },
+    type: {
+      type: String,
+      default: "provision", // default type for this model
+    },
   },
   { timestamps: true }
 );
