@@ -11,7 +11,7 @@ const transactionSchema = new Schema<Ttrans>(
     to: {
       type: Schema.ObjectId,
       required: true,
-      ref: "USER",
+      ref: "user",
     },
     amount: {
       type: Number,

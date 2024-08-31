@@ -183,9 +183,6 @@ export const getRecentUserTransactions = async (
     // Returning response
     return res.status(200).json({ data: recentTransactions });
   } catch (error) {
-    console.error("Error fetching recent transactions", error);
-    return res.status(500).json({
-      message: "An error occurred while fetching recent transactions.",
-    });
+    next(error);
   }
 };
