@@ -9,7 +9,7 @@ export const buyCoin = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { userId, amount, type } = req.body;
+  const { userId, amount } = req.body;
   const session = await mongoose.startSession();
   session.startTransaction(); // Start transaction session
 
@@ -31,7 +31,7 @@ export const buyCoin = async (
       amount,
       coinValue: coins,
       reference,
-      type,
+      type: "Credit",
       status: "pending", // set initial status to "pending"
     });
 
@@ -46,6 +46,7 @@ export const buyCoin = async (
 
     // You can update the purchase status to "initialized" or any other status if you like
     purchase.status = "initialized";
+    purchase.type = "Credit";
 
     await purchase.save({ session });
 
@@ -101,6 +102,7 @@ export const verifyCoin = async (
 
       // Update purchase status
       purchase.status = "completed";
+      purchase.type = "Credit";
       await purchase.save();
 
       // Update user's coin balance
@@ -110,8 +112,6 @@ export const verifyCoin = async (
       }
 
       user.coin += purchase.coinValue;
-      purchase.type = "Credit";
-
       await user.save();
 
       return res.status(200).json({

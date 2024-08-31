@@ -116,17 +116,11 @@ export const getUserTransactions = async (
       userId: user?.id,
     });
 
-    // Filtering only completed or failed purchaseCoinTransaction
-    const filteredPurchaseCoinTransaction = purchaseCoinTransaction.filter(
-      (transaction) =>
-        transaction.status === "completed" || transaction.status === "failed"
-    );
-
     // Combining all transactions
     const getAllData = [
       ...sendCoinTransactionTo,
       ...sendCoinTransactionFrom,
-      ...filteredPurchaseCoinTransaction, // Only completed or failed purchase coin transactions
+      ...purchaseCoinTransaction, // Only completed or failed purchase coin transactions
       ...purchaseProvisionTransaction,
     ];
 
