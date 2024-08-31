@@ -53,30 +53,42 @@ export const send_coin = async (
     recipient.coin += Number(amount);
     await recipient.save({ session });
 
-    // Create a transaction record, referencing the recipient's _id
-    const transaction = new Transaction({
+    // Create transaction records
+    const senderTransaction = new Transaction({
       from: sender._id,
-      to: recipient._id, // Use recipient's _id, not matno
+      to: recipient._id,
       amount,
       description,
-      type: "Debit", // or "Credit", based on your needs
+      type: "Debit", // Sender's transaction type
     });
 
-    await transaction.save({ session });
+    const recipientTransaction = new Transaction({
+      from: sender._id,
+      to: recipient._id,
+      amount,
+      description,
+      type: "Credit", // Recipient's transaction type
+    });
+
+    // Save both transactions
+    await senderTransaction.save({ session });
+    await recipientTransaction.save({ session });
 
     // Commit the transaction if everything is successful
     await session.commitTransaction();
     session.endSession();
 
+    // Respond with the sender's transaction record
     return res.status(200).json({
       message: "Transaction successful",
-      transaction,
+      transaction: senderTransaction, // Return sender's transaction record
     });
   } catch (error) {
     // Rollback transaction in case of an error
     await session.abortTransaction();
     session.endSession();
-    next(error);
+    console.error("Transaction Error:", error);
+    return res.status(500).json({ errormessage: "Transaction failed" });
   }
 };
 
