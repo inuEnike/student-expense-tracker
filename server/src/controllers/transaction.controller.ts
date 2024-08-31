@@ -134,3 +134,57 @@ export const getUserTransactions = async (
       .json({ message: "An error occurred while fetching transactions." });
   }
 };
+
+export const getRecentUserTransactions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user } = req.user;
+
+  try {
+    // Fetching transactions
+    const sendCoinTransactionFrom = await Transaction.find({ from: user?.id });
+    const sendCoinTransactionTo = await Transaction.find({ to: user?.id });
+    const purchaseCoinTransaction = await PurchaseCoin.find({
+      userId: user?.id,
+    });
+    const purchaseProvisionTransaction = await PurchaseProvision.find({
+      userId: user?.id,
+    });
+
+    // Filter only completed or failed purchaseCoinTransaction
+    const filteredPurchaseCoinTransaction = purchaseCoinTransaction.filter(
+      (transaction) =>
+        transaction.status === "completed" || transaction.status === "failed"
+    );
+
+    // Combine all transactions
+    let getAllData = [
+      ...sendCoinTransactionTo,
+      ...sendCoinTransactionFrom,
+      ...filteredPurchaseCoinTransaction,
+      ...purchaseProvisionTransaction,
+    ];
+
+    // Type assertion to add createdAt and updatedAt fields
+    getAllData = getAllData.sort(
+      (a, b) =>
+        new Date((b as any).createdAt).getTime() -
+        new Date((a as any).createdAt).getTime()
+    );
+
+    // Get the most recent 5 transactions
+    const recentTransactions = getAllData.slice(0, 5);
+
+    // Returning response
+    return res.status(200).json({ data: recentTransactions });
+  } catch (error) {
+    console.error("Error fetching recent transactions", error);
+    return res
+      .status(500)
+      .json({
+        message: "An error occurred while fetching recent transactions.",
+      });
+  }
+};

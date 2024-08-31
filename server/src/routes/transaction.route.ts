@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getAllTransactions,
+  getRecentUserTransactions,
   getUserTransactions,
   send_coin,
 } from "../controllers/transaction.controller";
@@ -11,6 +12,7 @@ const route = express();
 route
   .post("/send-coin", verifyToken, send_coin)
   .get("/transactions", getAllTransactions)
-  .get("/transaction", verifyToken, getUserTransactions);
+  .get("/transaction", verifyToken, getUserTransactions)
+  .get("/recent-transactions", getRecentUserTransactions);
 
 export default route;
