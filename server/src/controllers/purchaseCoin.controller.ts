@@ -9,7 +9,7 @@ export const buyCoin = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { userId, amount } = req.body;
+  const { userId, amount, type } = req.body;
   const session = await mongoose.startSession();
   session.startTransaction(); // Start transaction session
 
@@ -31,6 +31,7 @@ export const buyCoin = async (
       amount,
       coinValue: coins,
       reference,
+      type,
       status: "pending", // set initial status to "pending"
     });
 
@@ -45,6 +46,7 @@ export const buyCoin = async (
 
     // You can update the purchase status to "initialized" or any other status if you like
     purchase.status = "initialized";
+
     await purchase.save({ session });
 
     // Commit the transaction if everything is successful
@@ -69,7 +71,7 @@ export const verifyCoin = async (
   console.log("Webhook data received:", JSON.stringify(data, null, 2));
 
   if (data.event === "charge.success") {
-    const { reference } = data.data;
+    const { reference, type } = data.data;
 
     try {
       // Find the purchase record by reference
@@ -108,6 +110,8 @@ export const verifyCoin = async (
       }
 
       user.coin += purchase.coinValue;
+      purchase.type = "Credit";
+
       await user.save();
 
       return res.status(200).json({

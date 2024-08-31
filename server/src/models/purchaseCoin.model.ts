@@ -27,7 +27,7 @@ const purchaseCoinSchema = new Schema<TPurchaseCoin>(
     },
     type: {
       type: String,
-      default: "purchase", // default type for this model
+      default: "Debit", // default type for this model
     },
   },
   { timestamps: true }

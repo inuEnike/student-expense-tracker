@@ -31,7 +31,7 @@ const purchaseProvisionSchema = new Schema<TPurchaseProvision>(
     },
     type: {
       type: String,
-      default: "provision", // default type for this model
+      default: "Debit", // default type for this model
     },
   },
   { timestamps: true }

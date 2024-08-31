@@ -89,11 +89,11 @@ export const getAllTransactions = async (
 ) => {
   const sendCoinTransaction = await Transaction.find({});
   const purchaseCoinTransaction = await PurchaseCoin.find({});
-  const purchaseProvisionTransaction = await PurchaseProvision.find({});
+  // const purchaseProvisionTransaction = await PurchaseProvision.find({});
   const getAllData = [
     ...sendCoinTransaction,
     ...purchaseCoinTransaction,
-    ...purchaseProvisionTransaction,
+    // ...purchaseProvisionTransaction,
   ];
   return res.status(200).json({ data: getAllData });
 };
@@ -154,9 +154,9 @@ export const getRecentUserTransactions = async (
     const purchaseCoinTransaction = await PurchaseCoin.find({
       userId: user?.id,
     });
-    const purchaseProvisionTransaction = await PurchaseProvision.find({
-      userId: user?.id,
-    });
+    // const purchaseProvisionTransaction = await PurchaseProvision.find({
+    //   userId: user?.id,
+    // });
 
     // Filter only completed or failed purchaseCoinTransaction
     const filteredPurchaseCoinTransaction = purchaseCoinTransaction.filter(
@@ -169,7 +169,7 @@ export const getRecentUserTransactions = async (
       ...sendCoinTransactionTo,
       ...sendCoinTransactionFrom,
       ...filteredPurchaseCoinTransaction,
-      ...purchaseProvisionTransaction,
+      // ...purchaseProvisionTransaction,
     ];
 
     // Type assertion to add createdAt and updatedAt fields

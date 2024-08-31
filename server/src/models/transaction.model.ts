@@ -22,7 +22,7 @@ const transactionSchema = new Schema<Ttrans>(
     },
     type: {
       type: String,
-      default: "send", // default type for this model
+      default: "Debit", // default type for this model
     },
   },
   { timestamps: true }

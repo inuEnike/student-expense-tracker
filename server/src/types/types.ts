@@ -21,7 +21,7 @@ export type TPurchaseProvision = {
   item: "Food" | "Provision";
   status: string;
   coinSpent: number;
-  type?: "provision"; // optional field with default value
+  type?: string; // optional field with default value
 };
 
 // Purchase Coin Type
@@ -31,7 +31,7 @@ export type TPurchaseCoin = {
   amount: number;
   status: string;
   coinValue: number;
-  type?: "purchase"; // optional field with default value
+  type?: string; // optional field with default value
 };
 
 // Transaction Type
@@ -42,5 +42,5 @@ export type Ttrans = {
   description?: string; // optional field
   createdAt?: Date;
   updatedAt?: Date;
-  type?: "send" | "receive"; // optional field with default values
+  type?: string; // optional field with default values
 };
