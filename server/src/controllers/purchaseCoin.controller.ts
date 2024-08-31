@@ -113,7 +113,6 @@ export const verifyCoin = async (
 
       user.coin += purchase.coinValue;
       await user.save();
-
       return res.status(200).json({
         message: "Payment verified and coins added to user's balance",
         user,
