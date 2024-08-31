@@ -53,17 +53,13 @@ export const send_coin = async (
     recipient.coin += Number(amount);
     await recipient.save({ session });
 
-    // Determine the transaction type
-    const transactionType = sender._id.equals(from) ? "Debit" : "Credit";
-
-    // Create a transaction record
+    // Create a transaction record, referencing the recipient's _id
     const transaction = new Transaction({
       from: sender._id,
-      to: recipient.matno,
+      to: recipient._id, // Use recipient's _id, not matno
       amount,
       description,
-      date: new Date(),
-      type: transactionType, // Set the type based on the condition
+      type: "Debit", // or "Credit", based on your needs
     });
 
     await transaction.save({ session });
@@ -83,7 +79,6 @@ export const send_coin = async (
     next(error);
   }
 };
-
 
 export const getAllTransactions = async (
   req: Request,
