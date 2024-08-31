@@ -56,7 +56,7 @@ export const send_coin = async (
     // Create a transaction record
     const transaction = new Transaction({
       from: sender._id,
-      to: recipient._id,
+      to: recipient.matno,
       amount,
       description,
       date: new Date(),
@@ -77,8 +77,7 @@ export const send_coin = async (
     // Rollback transaction in case of an error
     await session.abortTransaction();
     session.endSession();
-    console.error("Error during transaction:", error);
-    return res.status(500).json({ errormessage: "Internal server error" });
+    next(error);
   }
 };
 
