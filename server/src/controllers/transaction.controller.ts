@@ -14,26 +14,29 @@ export const send_coin = async (
   session.startTransaction(); // Start transaction session
 
   try {
-    const { from, to, amount, description, pin } = req.body;
+    const { from, matno, amount, description, pin } = req.body;
 
     // Check if all required fields are present
-    if (!from || !to || !amount || !pin) {
+    if (!from || !matno || !amount || !pin) {
       return res.status(400).json({ errormessage: "All fields are required" });
     }
 
-    // Find the sender and recipient users
+    // Find the sender by their ID
     const sender = await USER.findById(from).session(session);
-    const recipient = await USER.findById(to).session(session);
-    const userWithPin = await USER.findById(from).session(session); // Find user by pin
-
-    // Check if both users exist
-    if (!sender || !recipient) {
-      return res
-        .status(404)
-        .json({ errormessage: "Sender or recipient not found" });
+    if (!sender) {
+      return res.status(404).json({ errormessage: "Sender not found" });
     }
 
-    if (!userWithPin || userWithPin.pin !== pin) {
+    // Find the recipient using their matno
+    const recipient = await USER.findOne({ matno }).session(session);
+    if (!recipient) {
+      return res
+        .status(404)
+        .json({ errormessage: "Recipient with the provided matno not found" });
+    }
+
+    // Validate the pin
+    if (sender.pin !== pin) {
       return res.status(400).json({ errormessage: "Invalid pin" });
     }
 
@@ -50,7 +53,7 @@ export const send_coin = async (
     recipient.coin += Number(amount);
     await recipient.save({ session });
 
-    // Determine the type based on the role
+    // Determine the transaction type
     const transactionType = sender._id.equals(from) ? "Debit" : "Credit";
 
     // Create a transaction record
@@ -80,6 +83,7 @@ export const send_coin = async (
     next(error);
   }
 };
+
 
 export const getAllTransactions = async (
   req: Request,
