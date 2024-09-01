@@ -154,14 +154,14 @@ export const getRecentUserTransactions = async (
   next: NextFunction
 ) => {
   const { user } = req.user;
-
+  const toUser = await USER.findById(req.params.id);
   try {
     // Fetching transactions
     const sendCoinTransactionFrom = await Transaction.find({
       from: user?.id,
     }).populate("from");
     const sendCoinTransactionTo = await Transaction.find({
-      to: user?.id,
+      to: toUser?._id,
     }).populate("to");
     const purchaseCoinTransaction = await PurchaseCoin.find({
       userId: user?.id,
