@@ -159,10 +159,10 @@ export const getRecentUserTransactions = async (
     // Fetching transactions
     const sendCoinTransactionFrom = await Transaction.find({
       from: user?.id,
-    }).populate("from");
+    }).populate(["from", "to"]);
     const sendCoinTransactionTo = await Transaction.find({
       to: toUser?._id,
-    }).populate("to");
+    }).populate(["from", "to"]);
     const purchaseCoinTransaction = await PurchaseCoin.find({
       userId: user?.id,
     }).populate("userId");
