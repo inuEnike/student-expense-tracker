@@ -117,21 +117,25 @@ export const getUserTransactions = async (
 
   try {
     // Fetching transactions
-    const sendCoinTransactionFrom = await Transaction.find({ from: user?.id });
-    const sendCoinTransactionTo = await Transaction.find({ to: user?.id });
+    const sendCoinTransactionFrom = await Transaction.find({
+      from: user?.id,
+    }).populate("from");
+    const sendCoinTransactionTo = await Transaction.find({
+      to: user?.id,
+    }).populate("to");
     const purchaseCoinTransaction = await PurchaseCoin.find({
       userId: user?.id,
-    });
-    const purchaseProvisionTransaction = await PurchaseProvision.find({
-      userId: user?.id,
-    });
+    }).populate("userId");
+    // const purchaseProvisionTransaction = await PurchaseProvision.find({
+    //   userId: user?.id,
+    // });
 
     // Combining all transactions
     const getAllData = [
       ...sendCoinTransactionTo,
       ...sendCoinTransactionFrom,
       ...purchaseCoinTransaction, // Only completed or failed purchase coin transactions
-      ...purchaseProvisionTransaction,
+      // ...purchaseProvisionTransaction,
     ];
 
     // Returning response
