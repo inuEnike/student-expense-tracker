@@ -70,6 +70,7 @@ export const send_coin = async (
     // Save the sender's transaction in the session
     await senderTransaction.save({ session });
 
+    console.log(transaction.to);
     // Conditionally create the recipient's transaction if 'to' exists
     if (transaction.to) {
       const recipientTransaction = new Transaction({
