@@ -53,52 +53,36 @@ export const send_coin = async (
     recipient.coin += Number(amount);
     await recipient.save({ session });
 
-    // Create a transaction object for both sender and recipient
-    const transaction = {
+    // Create transaction records
+    const senderTransaction = new Transaction({
       from: sender._id,
       to: recipient._id,
       amount,
       description,
-    };
-
-    // Create a sender's transaction (Debit)
-    const senderTransaction = new Transaction({
-      ...transaction, // No error here as transaction is a plain object
-      type: "Debit",
+      type: "Debit", // Sender's transaction type
     });
 
-    // Save the sender's transaction in the session
+    const recipientTransaction = new Transaction({
+      from: sender._id,
+      to: recipient._id,
+      amount,
+      description,
+      type: "Credit", // Recipient's transaction type
+    });
+
+    // Save both transactions
     await senderTransaction.save({ session });
-
-    console.log(transaction.to);
-    // Conditionally create the recipient's transaction if 'to' exists
-   
-      const recipientTransaction = new Transaction({
-        ...transaction,
-        type: "Credit",
-      });
-
-      // Save the recipient's transaction in the session
-      await recipientTransaction.save({ session });
- 
+    await recipientTransaction.save({ session });
 
     // Commit the transaction if everything is successful
     await session.commitTransaction();
     session.endSession();
 
-    if (transaction.to) {
     // Respond with the sender's transaction record
-    return res.status(200).json({
-      message: "Transaction successful",
-      transaction: recipientTransaction, // Return sender's transaction record
-    });
-
-  }else{
     return res.status(200).json({
       message: "Transaction successful",
       transaction: senderTransaction, // Return sender's transaction record
     });
-  }
   } catch (error) {
     // Rollback transaction in case of an error
     await session.abortTransaction();
@@ -175,13 +159,24 @@ export const getRecentUserTransactions = async (
     const sendCoinTransaction = await Transaction.find({
       from: user?.id,
     }).populate(["from", "to"]);
-
+    const sendCoinTransactionTo = await Transaction.find({
+      to: user?.id,
+    }).populate(["from", "to"]);
     const purchaseCoinTransaction = await PurchaseCoin.find({
       userId: user?.id,
     }).populate("userId");
+    // console.log(sendCoinTransactionTo);
 
-    const getAllData = [...sendCoinTransaction, ...purchaseCoinTransaction];
+    const searchUser = await USER.findOne({ matno: user.matno }).select(
+      "-password"
+    );
 
+    console.log(searchUser);
+    const getAllData = [
+      ...sendCoinTransaction,
+      ...sendCoinTransactionTo,
+      ...purchaseCoinTransaction,
+    ];
     // Sort transactions by creation date (descending)
     getAllData.sort(
       (a, b) =>
@@ -189,7 +184,7 @@ export const getRecentUserTransactions = async (
         new Date((a as any).createdAt).getTime()
     );
 
-    // Get the most recent 6 transactions
+    // Get the most recent 5 transactions
     const recentTransactions = getAllData.slice(0, 6);
 
     return res.status(200).json({ data: recentTransactions });
