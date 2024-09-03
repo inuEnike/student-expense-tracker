@@ -53,24 +53,27 @@ export const send_coin = async (
     recipient.coin += Number(amount);
     await recipient.save({ session });
 
-    // Create transaction records
+    // Create a transaction object for both sender and recipient
+    const transaction = {
+      from: sender._id,
+      to: recipient._id,
+      amount,
+      description,
+    };
+
+    // Create a sender's transaction (Debit)
     const senderTransaction = new Transaction({
-      from: sender._id,
-      to: recipient._id,
-      amount,
-      description,
-      type: "Debit", // Sender's transaction type
+      ...transaction, // No error here as transaction is a plain object
+      type: "Debit",
     });
 
+    // Create a recipient's transaction (Credit)
     const recipientTransaction = new Transaction({
-      from: sender._id,
-      to: recipient._id,
-      amount,
-      description,
-      type: "Credit", // Recipient's transaction type
+      ...transaction, // No error here as transaction is a plain object
+      type: "Credit",
     });
 
-    // Save both transactions
+    // Save both transactions in the same session
     await senderTransaction.save({ session });
     await recipientTransaction.save({ session });
 
@@ -159,24 +162,13 @@ export const getRecentUserTransactions = async (
     const sendCoinTransaction = await Transaction.find({
       from: user?.id,
     }).populate(["from", "to"]);
-    const sendCoinTransactionTo = await Transaction.find({
-      to: user?.id,
-    }).populate(["from", "to"]);
+
     const purchaseCoinTransaction = await PurchaseCoin.find({
       userId: user?.id,
     }).populate("userId");
-    // console.log(sendCoinTransactionTo);
 
-    const searchUser = await USER.findOne({ matno: user.matno }).select(
-      "-password"
-    );
+    const getAllData = [...sendCoinTransaction, ...purchaseCoinTransaction];
 
-    console.log(searchUser);
-    const getAllData = [
-      ...sendCoinTransaction,
-      ...sendCoinTransactionTo,
-      ...purchaseCoinTransaction,
-    ];
     // Sort transactions by creation date (descending)
     getAllData.sort(
       (a, b) =>
@@ -184,7 +176,7 @@ export const getRecentUserTransactions = async (
         new Date((a as any).createdAt).getTime()
     );
 
-    // Get the most recent 5 transactions
+    // Get the most recent 6 transactions
     const recentTransactions = getAllData.slice(0, 6);
 
     return res.status(200).json({ data: recentTransactions });
