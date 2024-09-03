@@ -192,7 +192,7 @@ export const getRecentUserTransactions = async (
     );
 
     // Get the most recent 5 transactions
-    const recentTransactions = getAllData.slice(0, 5);
+    const recentTransactions = getAllData.slice(0, 6);
 
     // Returning response
     return res.status(200).json({ data: recentTransactions });
