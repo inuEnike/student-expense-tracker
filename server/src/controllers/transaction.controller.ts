@@ -168,7 +168,7 @@ export const getRecentUserTransactions = async (
     // console.log(sendCoinTransactionTo);
 
     let searchUser;
-    searchUser = USER.find(user);
+    searchUser = USER.find(user.id).populate(["from", "to"]);
     console.log(searchUser);
     const getAllData = [
       ...sendCoinTransaction,
