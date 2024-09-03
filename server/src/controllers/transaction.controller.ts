@@ -148,55 +148,203 @@ export const getUserTransactions = async (
   }
 };
 
+
+// export const getRecentUserTransactions = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const { user } = req.user;
+//     if (!user?.id) {
+//       return res.status(400).json({ error: 'Invalid user data' });
+//     }
+
+//     // Find recipient user
+//     const toUser = await USER.findById(req.params.id);
+//     console.log(toUser)
+//     if (!toUser) {
+//       return res.status(404).json({ error: 'Recipient not found' });
+//     }
+
+//     // Fetch transactions
+//     const [sendCoinTransactionFrom, sendCoinTransactionTo, filteredPurchaseCoinTransaction] = await Promise.all([
+//       Transaction.find({ from: user.id }).populate(["from", "to"]),
+//       Transaction.find({ to: toUser._id }).populate(["from", "to"]),
+//       PurchaseCoin.find({ userId: user.id })
+//         .populate("userId")
+//         .where({ status: { $in: ["completed", "failed"] } })
+//     ]);
+
+//     // Combine all transactions with credit/debit types
+//     const getAllData = [
+//       ...sendCoinTransactionFrom.map(transaction => ({
+//         ...transaction.toObject(),
+//         transactionType: "Debit",
+//         amount: transaction.amount
+//       })),
+//       ...sendCoinTransactionTo.map(transaction => ({
+//         ...transaction.toObject(),
+//         transactionType: "Credit",
+//         amount: transaction.amount
+//       })),
+//       ...filteredPurchaseCoinTransaction.map(transaction => ({
+//         ...transaction.toObject(),
+//         transactionType: transaction.status === "completed" ? "Credit" : "Debit",
+//         amount: transaction.amount
+//       })),
+//     ];
+
+//     // Sort transactions by creation date (descending)
+//     getAllData.sort((a, b) => new Date((b as any).createdAt).getTime() - new Date((a as any).createdAt).getTime());
+
+//     // Get the most recent 5 transactions
+//     const recentTransactions = getAllData.slice(0, 5);
+
+//     return res.status(200).json({ data: recentTransactions });
+//   } catch (error) {
+//     return next(error);
+//   }
+// };
+
+
+// export const getRecentUserTransactions = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   const { user } = req.user;
+//   console.log(user);
+  
+//   const toUser = await USER.findById(req.params.id);
+//   try {
+//     // Fetching transactions
+//     const sendCoinTransactionFrom = await Transaction.find({
+//       from: user?.id,
+//     }).populate(["from", "to"]);
+//     const sendCoinTransactionTo = await Transaction.find({
+//       to: toUser?._id,
+//     }).populate(["from", "to"]);
+//     const purchaseCoinTransaction = await PurchaseCoin.find({
+//       userId: user?.id,
+//     }).populate("userId");
+//     // const purchaseProvisionTransaction = await PurchaseProvision.find({
+//     //   userId: user?.id,
+//     // });
+
+//     // Filter only completed or failed purchaseCoinTransaction
+//     const filteredPurchaseCoinTransaction = purchaseCoinTransaction.filter(
+//       (transaction) =>
+//         transaction.status === "completed" || transaction.status === "failed"
+//     );
+
+//     const findUser  = req.user.id
+//     if (findUser){
+//       Transaction.type = "Debit"
+//     }
+
+//     // Combine all transactions
+//     let getAllData = [
+//       ...sendCoinTransactionTo,
+//       ...sendCoinTransactionFrom,
+//       ...filteredPurchaseCoinTransaction,
+//       // ...purchaseProvisionTransaction,
+//     ];
+
+//     // Type assertion to add createdAt and updatedAt fields
+//     getAllData = getAllData.sort(
+//       (a, b) =>
+//         new Date((b as any).createdAt).getTime() -
+//         new Date((a as any).createdAt).getTime()
+//     );
+
+//     // Get the most recent 5 transactions
+//     const recentTransactions = getAllData.slice(0, 5);
+
+//     // Returning response
+//     return res.status(200).json({ data: recentTransactions });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// export const getRecentUserTransactions = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   const { user } = req.user;
+//   console.log(user);
+
+//   try {
+//     // Fetching transactions
+//     const sendCoinTransactionFrom = await Transaction.find({ from: user?.id })
+//       .populate(["from", "to"]);
+//     const purchaseCoinTransaction = await PurchaseCoin.find({ userId: user?.id })
+//       .populate("userId");
+
+//     // Filter only completed or failed purchaseCoinTransaction
+//     const filteredPurchaseCoinTransaction = purchaseCoinTransaction.filter(
+//       (transaction) => transaction.status === "completed" || transaction.status === "failed"
+//     );
+
+//     // Combine all transactions while calculating credit/debit
+//     const getAllData = [
+//       ...sendCoinTransactionFrom.map((transaction) => ({
+//         ...transaction,
+//         // Calculate credit/debit based on user's role in the transaction
+//         transactionType: transaction.from.value === user?.id ? "Debit" : "Credit",
+//       })),
+//       ...filteredPurchaseCoinTransaction.map((transaction) => ({
+//         ...transaction,
+//         transactionType: transaction.status === "completed" ? "Credit" : "Debit",
+//       })),
+//     ];
+
+//     // Sort transactions by creation date (descending)
+//     getAllData.sort((a, b) => {
+//       return new Date((b as any).createdAt).getTime() - new Date((a as any).createdAt).getTime();
+//     });
+
+//     // Get the most recent 5 transactions
+//     const recentTransactions = getAllData.slice(0, 5);
+
+//     return res.status(200).json({ data: recentTransactions });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+
 export const getRecentUserTransactions = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
   const { user } = req.user;
-  const toUser = await USER.findById(req.params.id);
   try {
-    // Fetching transactions
-    const sendCoinTransactionFrom = await Transaction.find({
-      from: user?.id,
-    }).populate(["from", "to"]);
-    const sendCoinTransactionTo = await Transaction.find({
-      to: toUser?._id,
-    }).populate(["from", "to"]);
-    const purchaseCoinTransaction = await PurchaseCoin.find({
-      userId: user?.id,
-    }).populate("userId");
-    // const purchaseProvisionTransaction = await PurchaseProvision.find({
-    //   userId: user?.id,
-    // });
-
-    // Filter only completed or failed purchaseCoinTransaction
-    const filteredPurchaseCoinTransaction = purchaseCoinTransaction.filter(
-      (transaction) =>
-        transaction.status === "completed" || transaction.status === "failed"
-    );
-
-    // Combine all transactions
-    let getAllData = [
-      ...sendCoinTransactionTo,
-      ...sendCoinTransactionFrom,
-      ...filteredPurchaseCoinTransaction,
-      // ...purchaseProvisionTransaction,
-    ];
-
-    // Type assertion to add createdAt and updatedAt fields
-    getAllData = getAllData.sort(
-      (a, b) =>
-        new Date((b as any).createdAt).getTime() -
-        new Date((a as any).createdAt).getTime()
-    );
+        // Fetching transactions
+        const sendCoinTransaction = await Transaction.find({ from: user?.id })
+          .populate(["from", "to"]);
+          const sendCoinTransactionTo = await Transaction.find({ to: user?.id })
+          .populate(["from", "to"]);
+        const purchaseCoinTransaction = await PurchaseCoin.find({ userId: user?.id })
+          .populate("userId");
+          console.log(sendCoinTransactionTo);
+          
+        const getAllData = [
+          ...sendCoinTransaction,
+          ...sendCoinTransactionTo,
+          ...purchaseCoinTransaction
+        ]
+        // Sort transactions by creation date (descending)
+    getAllData.sort((a, b) => new Date((b as any).createdAt).getTime() - new Date((a as any).createdAt).getTime());
 
     // Get the most recent 5 transactions
     const recentTransactions = getAllData.slice(0, 6);
 
-    // Returning response
     return res.status(200).json({ data: recentTransactions });
-  } catch (error) {
-    next(error);
+  }catch(error){
+    next(error)
   }
-};
+}
