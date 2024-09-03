@@ -81,7 +81,8 @@ export const send_coin = async (
     // Respond with the sender's transaction record
     return res.status(200).json({
       message: "Transaction successful",
-      transaction: senderTransaction, // Return sender's transaction record
+      senderTransaction, // Return sender's transaction record
+      recipientTransaction, // Return recipient's transaction record
     });
   } catch (error) {
     // Rollback transaction in case of an error
