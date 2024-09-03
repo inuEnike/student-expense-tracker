@@ -72,7 +72,7 @@ export const send_coin = async (
 
     console.log(transaction.to);
     // Conditionally create the recipient's transaction if 'to' exists
-    if (transaction.to) {
+   
       const recipientTransaction = new Transaction({
         ...transaction,
         type: "Credit",
@@ -80,17 +80,25 @@ export const send_coin = async (
 
       // Save the recipient's transaction in the session
       await recipientTransaction.save({ session });
-    }
+ 
 
     // Commit the transaction if everything is successful
     await session.commitTransaction();
     session.endSession();
 
+    if (transaction.to) {
     // Respond with the sender's transaction record
+    return res.status(200).json({
+      message: "Transaction successful",
+      transaction: recipientTransaction, // Return sender's transaction record
+    });
+
+  }else{
     return res.status(200).json({
       message: "Transaction successful",
       transaction: senderTransaction, // Return sender's transaction record
     });
+  }
   } catch (error) {
     // Rollback transaction in case of an error
     await session.abortTransaction();
