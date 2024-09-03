@@ -167,7 +167,10 @@ export const getRecentUserTransactions = async (
     }).populate("userId");
     // console.log(sendCoinTransactionTo);
 
-    let searchUser = USER.findOne({ user }).populate(["from", "to"]);
+    const searchUser = await USER.findOne({ matno: user.matno }).select(
+      "-password"
+    );
+
     console.log(searchUser);
     const getAllData = [
       ...sendCoinTransaction,
