@@ -148,39 +148,45 @@ export const getUserTransactions = async (
   }
 };
 
-
 export const getRecentUserTransactions = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { user } = req.user;
   try {
-        // Fetching transactions
-        const sendCoinTransaction = await Transaction.find({ from: user?.id })
-          .populate(["from", "to"]);
-          const sendCoinTransactionTo = await Transaction.find({ to: user?.id })
-          .populate(["from", "to"]);
-        const purchaseCoinTransaction = await PurchaseCoin.find({ userId: user?.id })
-          .populate("userId");
-          console.log(sendCoinTransactionTo);
+    // Fetching transactions
+    const sendCoinTransaction = await Transaction.find({
+      from: user?.id,
+    }).populate(["from", "to"]);
+    const sendCoinTransactionTo = await Transaction.find({
+      to: user?.id,
+    }).populate(["from", "to"]);
+    const purchaseCoinTransaction = await PurchaseCoin.find({
+      userId: user?.id,
+    }).populate("userId");
+    // console.log(sendCoinTransactionTo);
 
-          let searchUser;
-          searchUser = USER.find(user)
-          console.log(searchUser)
-        const getAllData = [
-          ...sendCoinTransaction,
-          ...sendCoinTransactionTo,
-          ...purchaseCoinTransaction
-        ]
-        // Sort transactions by creation date (descending)
-    getAllData.sort((a, b) => new Date((b as any).createdAt).getTime() - new Date((a as any).createdAt).getTime());
+    let searchUser;
+    searchUser = USER.find(user);
+    console.log(searchUser);
+    const getAllData = [
+      ...sendCoinTransaction,
+      ...sendCoinTransactionTo,
+      ...purchaseCoinTransaction,
+    ];
+    // Sort transactions by creation date (descending)
+    getAllData.sort(
+      (a, b) =>
+        new Date((b as any).createdAt).getTime() -
+        new Date((a as any).createdAt).getTime()
+    );
 
     // Get the most recent 5 transactions
     const recentTransactions = getAllData.slice(0, 6);
 
     return res.status(200).json({ data: recentTransactions });
-  }catch(error){
-    next(error)
+  } catch (error) {
+    next(error);
   }
-}
+};
