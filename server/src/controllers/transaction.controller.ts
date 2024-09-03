@@ -175,7 +175,7 @@ export const getRecentUserTransactions = async (
     console.log(searchUser);
     const getAllData = [
       ...sendCoinTransaction,
-      ...sendCoinTransactionTo,
+      // ...sendCoinTransactionTo,
       ...purchaseCoinTransaction,
     ];
     // Sort transactions by creation date (descending)
