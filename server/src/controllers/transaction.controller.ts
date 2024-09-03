@@ -335,15 +335,16 @@ export const getRecentUserTransactions = async (
       (transaction) => transaction.status === "completed" || transaction.status === "failed"
     );
 
+    console.log(...sendCoinTransactionFrom)
     // Combine all transactions while calculating credit/debit
     const getAllData = [
       ...sendCoinTransactionFrom.map((transaction) => ({
         ...transaction,
-        transactionType: transaction.from.toString() === user.id ? "Debit" : "Credit",
+        type: transaction.from.toString() === user.id ? "Debit" : "Credit",
       })),
       ...filteredPurchaseCoinTransaction.map((transaction) => ({
         ...transaction,
-        transactionType: transaction.status === "completed" ? "Credit" : "Debit",
+        type: transaction.status === "completed" ? "Credit" : "Debit",
       })),
     ];
 
