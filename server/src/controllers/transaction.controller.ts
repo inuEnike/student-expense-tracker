@@ -156,28 +156,30 @@ export const getRecentUserTransactions = async (
 ) => {
   const { user } = req.user;
   try {
-    // Fetching transactions
+    // Fetching transactions where the user is the sender (Debit)
     const sendCoinTransaction = await Transaction.find({
       from: user?.id,
+      type: "Debit", // Only debit transactions for senders
     }).populate(["from", "to"]);
-    const sendCoinTransactionTo = await Transaction.find({
+
+    // Fetching transactions where the user is the recipient (Credit)
+    const receiveCoinTransaction = await Transaction.find({
       to: user?.id,
+      type: "Credit", // Only credit transactions for receivers
     }).populate(["from", "to"]);
+
+    // Fetching purchase transactions related to the user
     const purchaseCoinTransaction = await PurchaseCoin.find({
       userId: user?.id,
     }).populate("userId");
-    // console.log(sendCoinTransactionTo);
 
-    const searchUser = await USER.findOne({ matno: user.matno }).select(
-      "-password"
-    );
-
-    console.log(searchUser);
+    // Combining all transactions
     const getAllData = [
-      ...sendCoinTransaction,
-      ...sendCoinTransactionTo,
-      ...purchaseCoinTransaction,
+      ...sendCoinTransaction, // Debit transactions (sender side)
+      ...receiveCoinTransaction, // Credit transactions (recipient side)
+      ...purchaseCoinTransaction, // Purchase coin transactions
     ];
+
     // Sort transactions by creation date (descending)
     getAllData.sort(
       (a, b) =>
@@ -185,7 +187,7 @@ export const getRecentUserTransactions = async (
         new Date((a as any).createdAt).getTime()
     );
 
-    // Get the most recent 5 transactions
+    // Get the most recent 6 transactions
     const recentTransactions = getAllData.slice(0, 6);
 
     return res.status(200).json({ data: recentTransactions });
