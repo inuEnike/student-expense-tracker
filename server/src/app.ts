@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from "express";
-import britannia from "britannia";
+// import britannia from "britannia";
 import cors from "cors";
 import errorhandler from "./middleware/error";
 import auth from "./routes/user.route";
@@ -17,7 +17,7 @@ const corsOptions = {
 
 const app: Express = express();
 
-app.use(britannia());
+// app.use(britannia());
 // Use CORS with the specified options
 app.use(cors(corsOptions));
 
