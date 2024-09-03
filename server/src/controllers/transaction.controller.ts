@@ -67,15 +67,19 @@ export const send_coin = async (
       type: "Debit",
     });
 
-    // Create a recipient's transaction (Credit)
-    const recipientTransaction = new Transaction({
-      ...transaction, // No error here as transaction is a plain object
-      type: "Credit",
-    });
-
-    // Save both transactions in the same session
+    // Save the sender's transaction in the session
     await senderTransaction.save({ session });
-    await recipientTransaction.save({ session });
+
+    // Conditionally create the recipient's transaction if 'to' exists
+    if (transaction.to) {
+      const recipientTransaction = new Transaction({
+        ...transaction,
+        type: "Credit",
+      });
+
+      // Save the recipient's transaction in the session
+      await recipientTransaction.save({ session });
+    }
 
     // Commit the transaction if everything is successful
     await session.commitTransaction();
