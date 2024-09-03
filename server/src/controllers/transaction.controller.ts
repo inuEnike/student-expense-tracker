@@ -330,7 +330,8 @@ export const getRecentUserTransactions = async (
           .populate(["from", "to"]);
         const purchaseCoinTransaction = await PurchaseCoin.find({ userId: user?.id })
           .populate("userId");
-    
+          console.log(sendCoinTransactionTo);
+          
         const getAllData = [
           ...sendCoinTransaction,
           ...sendCoinTransactionTo,
