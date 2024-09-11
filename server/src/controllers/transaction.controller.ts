@@ -115,31 +115,40 @@ export const getUserTransactions = async (
   next: NextFunction
 ) => {
   const { user } = req.user;
-
   try {
-    // Fetching transactions
-    const sendCoinTransactionFrom = await Transaction.find({
+    // Fetching transactions where the user is the sender (Debit)
+    const sendCoinTransaction = await Transaction.find({
       from: user?.id,
-    }).populate("from");
-    const sendCoinTransactionTo = await Transaction.find({
+      type: "Debit", // Only debit transactions for senders
+    }).populate(["from", "to"]);
+
+    // Fetching transactions where the user is the recipient (Credit)
+    const receiveCoinTransaction = await Transaction.find({
       to: user?.id,
-    }).populate("to");
+      type: "Credit", // Only credit transactions for receivers
+    }).populate(["from", "to"]);
+
+    // Fetching purchase transactions related to the user
     const purchaseCoinTransaction = await PurchaseCoin.find({
       userId: user?.id,
     }).populate("userId");
-    // const purchaseProvisionTransaction = await PurchaseProvision.find({
-    //   userId: user?.id,
-    // });
 
     // Combining all transactions
     const getAllData = [
-      ...sendCoinTransactionTo,
-      ...sendCoinTransactionFrom,
-      ...purchaseCoinTransaction, // Only completed or failed purchase coin transactions
-      // ...purchaseProvisionTransaction,
+      ...sendCoinTransaction, // Debit transactions (sender side)
+      ...receiveCoinTransaction, // Credit transactions (recipient side)
+      ...purchaseCoinTransaction, // Purchase coin transactions
     ];
 
-    // Returning response
+    // Sort transactions by creation date (descending)
+    getAllData.sort(
+      (a, b) =>
+        new Date((b as any).createdAt).getTime() -
+        new Date((a as any).createdAt).getTime()
+    );
+
+    // Get the most recent 6 transactions
+
     return res.status(200).json({ data: getAllData });
   } catch (error) {
     console.error("Error fetching user transactions", error);
