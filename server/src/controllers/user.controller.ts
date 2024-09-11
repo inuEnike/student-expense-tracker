@@ -3,6 +3,7 @@ import { USER } from "../models/user.model";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { ENV_DATA } from "../utils/envData";
+import transporter from "../utils/mailer";
 
 export const getAllUsers = async (
   req: Request,
@@ -92,6 +93,27 @@ export const getUser = async (
 ) => {
   let data = req.user.user;
   const user = await USER.findOne({ matno: data.matno }).select("-password");
+  console.log(user);
+  const userCoin = user?.coin || 0;
+  if (userCoin < 20 && user?.email) {
+    await transporter.sendMail({
+      from: '"Inu Enike 👻" <inuenike@gmail.com>', // sender address
+      to: user?.email, // recipient's email address
+      subject: "Low Coin Balance Warning", // subject line
+      text: `Hello ${
+        user?.surname || "User"
+      },\n\nWe noticed that your current coin balance is ${userCoin} coins. While there's no immediate action required, we just wanted to let you know that your balance is getting low. Feel free to top up anytime.\n\nBest regards,\nThe Team`, // plain text body
+      html: `
+        <h3>Hello ${user?.surname || "User"},</h3>
+        <p>This is just a friendly reminder that your current coin balance is <strong>${userCoin} coins</strong>.</p>
+        <p>While there's no immediate action required, we thought you might like to know that your balance is getting a little low. Feel free to top up whenever it’s convenient for you.</p>
+        <br>
+        <p>Best regards,</p>
+        <p><strong>The Team</strong></p>
+      `, // HTML body
+    });
+    console.log(`Low balance warning email sent to ${user.email}`);
+  }
   return res.status(200).json(user);
 };
 

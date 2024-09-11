@@ -8,4 +8,6 @@ export const ENV_DATA = {
   JWT_SECRET: process.env.JWT_SECRET,
   PAYSTACK_KEY: process.env.PAYSTACK_SECRET_KEY,
   NGROK_API_KEY: process.env.NGROK_API_KEY,
+  MAILER_NAME: process.env.MAILER_NAME,
+  MAILER_PASSWORD: process.env.MAILER_PASSWORD,
 };
