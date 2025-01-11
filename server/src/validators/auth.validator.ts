@@ -30,11 +30,6 @@ export const signupValidator = async (
     return res.status(400).json({ errMessage: "Passwords must match" });
   }
 
-  if (!matno.startsWith("ESH")) {
-    return res
-      .status(400)
-      .json({ errMessage: "Matriculation number must start with 'ESH'" });
-  }
 
   if (!specialCharRegex.test(password)) {
     return res.status(400).json({
