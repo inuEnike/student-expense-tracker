@@ -27,12 +27,6 @@ const USERMODEL = new Schema<TUser>(
     matno: {
       type: String,
       required: true,
-      validate: {
-        validator: (value: string) => {
-          return value.startsWith("ESH");
-        },
-        message: "matno must start with 'ESH'",
-      },
     },
     coin: {
       type: Number,

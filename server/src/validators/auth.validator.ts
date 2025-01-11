@@ -70,11 +70,7 @@ export const signinValidator = async (
     return res.status(400).json({ errMessage: "All fields are required" });
   }
 
-  if (!matno.startsWith("ESH")) {
-    return res
-      .status(400)
-      .json({ errMessage: "Matriculation number must start with 'ESH'" });
-  }
+
 
   try {
     const user = await USER.findOne({ matno });
