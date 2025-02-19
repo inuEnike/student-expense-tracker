@@ -130,14 +130,33 @@ export const setPin = async (
   next: NextFunction
 ) => {
   const { pin } = req.body;
+
+  // Validate pin length (ensure it's a string and has exactly 4 digits)
   if (pin.length > 4) {
     return res.json({ message: "Pin must not be greater than 4 digits" });
   } else if (pin.length < 4) {
-    return res.json({ message: "Pin must not be Less than 4 digits" });
+    return res.json({ message: "Pin must not be less than 4 digits" });
   }
-  let data = req.user.user;
-  const Pin = USER.findByIdAndUpdate(data.id, {
-    pin,
-  });
-  return res.json({ message: "User Created", Pin });
+
+  try {
+    // Assuming user data is attached to req.user from authentication
+    let data = req.user.user;
+
+    // Find user and update the pin
+    const updatedUser = await USER.findByIdAndUpdate(
+      data.id,
+      { pin },
+      { new: true } // Return the updated document
+    );
+
+    // If user is not found
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.json({ message: "Pin updated successfully", updatedUser });
+  } catch (error) {
+    console.error("Error updating pin:", error);
+    return res.status(500).json({ message: "Server error, please try again" });
+  }
 };
