@@ -130,8 +130,10 @@ export const setPin = async (
   next: NextFunction
 ) => {
   const { pin } = req.body;
-  if (pin > 4 || pin < 4 || pin === "") {
+  if (pin.length > 4) {
     return res.json({ message: "Pin must not be greater than 4 digits" });
+  } else if (pin.length < 4) {
+    return res.json({ message: "Pin must not be Less than 4 digits" });
   }
   let data = req.user.user;
   const Pin = USER.findByIdAndUpdate(data.id, {
