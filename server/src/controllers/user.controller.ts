@@ -123,3 +123,18 @@ const handleToken = (user: any) => {
   });
   return token;
 };
+
+export const setPin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { pin } = req.body;
+  if (pin > 4 || pin < 4) {
+    return res.json({ message: "Pin must not be greater than 4 digits" });
+  }
+  const userPin = USER.create({
+    pin,
+  });
+  return res.json({ message: "User Created", userPin });
+};

@@ -2,6 +2,7 @@ import express from "express";
 import {
   getAllUsers,
   getUser,
+  setPin,
   signin,
   Signup,
 } from "../controllers/user.controller";
@@ -14,6 +15,7 @@ router
   .get("/all-users", verifyToken, getAllUsers)
   .post("/signup", signupValidator, Signup)
   .post("/signin", signinValidator, signin)
+  .post("/set-pin", verifyToken, setPin)
   .get("/get-user", verifyToken, getUser);
 
 export default router;
