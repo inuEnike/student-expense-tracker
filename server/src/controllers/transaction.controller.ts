@@ -5,6 +5,7 @@ import { USER } from "../models/user.model";
 import { PurchaseCoin } from "../models/purchaseCoin.model";
 import { PurchaseProvision } from "../models/purchaseProvision.model";
 
+
 export const send_coin = async (
   req: Request,
   res: Response,
@@ -16,7 +17,7 @@ export const send_coin = async (
   try {
     let { from, matno, amount, description, pin } = req.body;
     const MAX_TRANSACTION_AMOUNT = 5000; // Single transaction limit
-    const DAILY_TRANSACTION_LIMIT = 20000; // Daily transaction limit
+    const DAILY_TRANSACTION_LIMIT = 2000; // Daily transaction limit
 
     // Convert amount to a number
     amount = Number(amount);
@@ -73,6 +74,7 @@ export const send_coin = async (
 
     const totalAmountSent =
       totalSentToday.length > 0 ? totalSentToday[0].totalAmount : 0;
+
 
     if (totalAmountSent + amount > DAILY_TRANSACTION_LIMIT) {
       return res.status(400).json({
