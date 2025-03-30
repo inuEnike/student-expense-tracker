@@ -160,3 +160,56 @@ export const setPin = async (
     return res.status(500).json({ message: "Server error, please try again" });
   }
 };
+
+export const updatePin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { oldPin, newPin, confirmNewPin } = req.body;
+
+  // Validate new PIN length
+  if (newPin.length > 4 || newPin.length < 4) {
+    return res.json({ message: "New pin must be exactly 4 digits" });
+  }
+
+  // Check if new PIN matches the confirm PIN
+  if (newPin !== confirmNewPin) {
+    return res.json({ message: "New PIN and confirm PIN do not match" });
+  }
+
+  try {
+    // Assuming user data is attached to req.user from authentication
+    const userId = req.user.user.id;
+
+    // Find the user by ID
+    const user = await USER.findById(userId);
+
+    // If user is not found
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the old PIN matches (if you are storing PIN as plaintext)
+    if (user.pin !== oldPin) {
+      return res.json({ message: "Old PIN is incorrect" });
+    }
+
+    // Update the PIN
+    const updatedUser = await USER.findByIdAndUpdate(
+      userId,
+      { pin: newPin },
+      { new: true } // Return the updated document
+    );
+
+    // If the update fails
+    if (!updatedUser) {
+      return res.status(500).json({ message: "Error updating PIN" });
+    }
+
+    return res.json({ message: "Pin updated successfully", updatedUser });
+  } catch (error) {
+    console.error("Error updating pin:", error);
+    return res.status(500).json({ message: "Server error, please try again" });
+  }
+};

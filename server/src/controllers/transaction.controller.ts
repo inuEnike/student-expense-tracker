@@ -5,6 +5,15 @@ import { USER } from "../models/user.model";
 import { PurchaseCoin } from "../models/purchaseCoin.model";
 import { PurchaseProvision } from "../models/purchaseProvision.model";
 
+const transaction_limit = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const fetch_transactions = await Transaction.find();
+  console.log(fetch_transactions);
+};
+
 export const send_coin = async (
   req: Request,
   res: Response,
@@ -14,7 +23,12 @@ export const send_coin = async (
   session.startTransaction(); // Start transaction session
 
   try {
-    const { from, matno, amount, description, pin } = req.body;
+    let { from, matno, amount, description, pin } = req.body;
+    const MAX_TRANSACTION_AMOUNT = 5000; // Single transaction limit
+    const DAILY_TRANSACTION_LIMIT = 20000; // Daily transaction limit
+
+    // Convert amount to a number
+    amount = Number(amount);
 
     // Check if all required fields are present
     if (!from || !matno || !amount || !pin) {
@@ -40,17 +54,56 @@ export const send_coin = async (
       return res.status(400).json({ errormessage: "Invalid pin" });
     }
 
+    // Check if the amount exceeds the maximum transaction limit
+    if (amount > MAX_TRANSACTION_AMOUNT) {
+      return res.status(400).json({
+        errormessage: `Transaction limit exceeded. Maximum allowed is ${MAX_TRANSACTION_AMOUNT} coins.`,
+      });
+    }
+
+    // Get today's date range
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Fetch total transactions for the sender on the current day
+    const totalSentToday = await Transaction.aggregate([
+      {
+        $match: {
+          from: sender._id,
+          createdAt: { $gte: startOfDay, $lte: endOfDay },
+        },
+      },
+      {
+        $group: { _id: null, totalAmount: { $sum: { $toDouble: "$amount" } } },
+      },
+    ]);
+
+    const totalAmountSent =
+      totalSentToday.length > 0 ? totalSentToday[0].totalAmount : 0;
+
+    console.log(
+      `Total sent today: ${totalAmountSent}, New amount: ${amount}, Daily Limit: ${DAILY_TRANSACTION_LIMIT}`
+    );
+
+    if (totalAmountSent + amount > DAILY_TRANSACTION_LIMIT) {
+      return res.status(400).json({
+        errormessage: `Daily transaction limit exceeded. Maximum allowed per day is ${DAILY_TRANSACTION_LIMIT} coins.`,
+      });
+    }
+
     // Check if the sender has sufficient coin
     if (sender.coin < amount) {
       return res.status(400).json({ errormessage: "Insufficient coin" });
     }
 
     // Deduct the amount from the sender's coin
-    sender.coin -= Number(amount);
+    sender.coin -= amount;
     await sender.save({ session });
 
     // Add the amount to the recipient's coin
-    recipient.coin += Number(amount);
+    recipient.coin += amount;
     await recipient.save({ session });
 
     // Create transaction records
