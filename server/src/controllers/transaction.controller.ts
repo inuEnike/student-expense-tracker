@@ -5,15 +5,6 @@ import { USER } from "../models/user.model";
 import { PurchaseCoin } from "../models/purchaseCoin.model";
 import { PurchaseProvision } from "../models/purchaseProvision.model";
 
-const transaction_limit = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const fetch_transactions = await Transaction.find();
-  console.log(fetch_transactions);
-};
-
 export const send_coin = async (
   req: Request,
   res: Response,
@@ -82,10 +73,6 @@ export const send_coin = async (
 
     const totalAmountSent =
       totalSentToday.length > 0 ? totalSentToday[0].totalAmount : 0;
-
-    console.log(
-      `Total sent today: ${totalAmountSent}, New amount: ${amount}, Daily Limit: ${DAILY_TRANSACTION_LIMIT}`
-    );
 
     if (totalAmountSent + amount > DAILY_TRANSACTION_LIMIT) {
       return res.status(400).json({
